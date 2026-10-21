@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171717">
+  <title>PIA厚木（本厚木）｜過去データ分析・設置台</title>
+  <link rel="stylesheet" href="static/viewer.css">
+  <script defer src="static/viewer.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="PIA厚木 ホーム"><span class="pia-logo">PIA</span><span>過去データ分析<span class="brand-sub">PIA厚木・本厚木</span></span></a>
+      <button id="refreshButton" class="button button-outline" type="button"><span aria-hidden="true">↻</span> 更新</button>
+    </div>
+  </header>
+  <main class="container">
+    <div id="tickerBox" class="ticker-bar" hidden><span class="ticker-label">お知らせ</span><span id="tickerText"></span></div>
+
+    <section class="card store-overview" aria-labelledby="storeName">
+      <div>
+        <div class="eyebrow">HON-ATSUGI ONLY</div>
+        <h1 id="storeName">PIA厚木 <span class="muted">（本厚木）</span></h1>
+        <p id="storeAddress" class="muted small">店舗・設置台情報を取得しています…</p>
+        <div id="storeBadges" class="badge-list"></div>
+      </div>
+      <div class="store-actions">
+        <button id="btnFloorMap" class="button button-outline" type="button" hidden>フロアマップ</button>
+        <button id="btnFlyers" class="button button-outline" type="button" hidden>チラシ・お知らせ</button>
+        <a id="btnGoogleMap" class="button button-outline" target="_blank" rel="noopener noreferrer" hidden>地図を見る ↗</a>
+      </div>
+    </section>
+
+    <div class="type-tabs" role="group" aria-label="分析・設置台の種別">
+      <button id="slotTab" class="type-tab active" type="button" data-kind="slot" aria-pressed="true">スロット <span id="slotTotalCount" class="tab-count">—</span></button>
+      <button id="pachinkoTab" class="type-tab" type="button" data-kind="pachinko" aria-pressed="false">パチンコ <span id="pachinkoTotalCount" class="tab-count">—</span></button>
+    </div>
+
+    <section id="analysisPanel" class="card analysis-panel" aria-labelledby="analysisHeading">
+      <div class="section-heading">
+        <div><div class="eyebrow">HISTORY ANALYSIS</div><h2 id="analysisHeading">公開データからの注目台</h2><p class="muted small">データ取得後に自動集計。表示中は5分ごとに更新します。</p></div>
+        <label class="period-control" for="analysisDays">分析期間<select id="analysisDays"><option value="7">直近7日</option><option value="14">直近14日</option><option value="30">直近30日</option><option value="90" selected>直近90日</option><option value="180">直近180日</option><option value="365">直近365日</option></select></label>
+      </div>
+      <p class="analysis-caution">履歴が揃った台を同一機種内で比較します。参考スコアは将来の当選確率ではありません。</p>
+      <p id="sourceCaution" class="source-caution">公開されている取材レポートの掲載日・掲載台が対象です。毎日の全台実績ではなく、対象には偏りがあります。</p>
+      <details id="sourceDetails" class="source-caution" hidden><summary>収録範囲・日付の注記</summary><p id="sourceNotes"></p></details>
+      <div id="analysisStatus" class="status-box loading" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>過去データを確認しています…</span></div>
+      <div id="analysisContent" hidden>
+        <div class="analysis-summary" id="analysisSummary"></div>
+        <div class="analysis-layout">
+          <div class="ranking-block"><div class="block-heading"><h3 id="candidateHeading">過去実績の参考順位</h3><span id="candidateLimit" class="muted small">上位10台</span></div><div id="observationControls" class="observation-controls" hidden><label for="observationSort">表示順<select id="observationSort"><option value="net">合計差枚順</option><option value="unit">台番号順</option></select></label><p id="observationNote">掲載された日の合計差枚です。掲載日数が異なるため将来の優劣は判断できません。</p></div><div id="candidateList" class="candidate-list"></div></div>
+          <div class="history-block"><div class="block-heading"><h3 id="historyHeading">日別実績</h3></div><div id="historyChart"></div><div id="candidateEvidence" class="evidence"></div></div>
+        </div>
+      </div>
+      <div id="analysisFooter" class="analysis-footer"><span id="analysisCoverage">収録状況を確認中</span><span id="analysisUpdated"></span><a id="analysisSource" target="_blank" rel="noopener noreferrer" hidden>データ出典 ↗</a></div>
+      <section id="collectionPanel" class="collection-panel" aria-labelledby="collectionHeading">
+        <div class="collection-heading"><h3 id="collectionHeading">サーバー保存状況</h3><span id="collectionStatus" class="collection-status">確認中</span></div>
+        <p id="collectionSchedule" class="collection-schedule">保存スケジュールを確認しています…</p>
+        <dl id="collectionFacts" class="collection-facts" hidden></dl>
+        <p id="collectionMessage" class="collection-message" hidden></p>
+        <p id="officialSnapshotNote" class="collection-message" hidden></p>
+        <details id="officialSnapshotDetails" class="collection-details" hidden><summary>公式ランキングの注記</summary><p id="officialSnapshotMessage"></p></details>
+      </section>
+    </section>
+
+    <section class="machine-section" aria-labelledby="machinesHeading">
+      <div class="section-heading machine-heading"><div><div class="eyebrow">MACHINE LINEUP</div><h2 id="machinesHeading">設置機種・台番号</h2></div><div class="search-box"><label class="sr-only" for="searchInput">機種名・台番号で検索</label><input type="search" id="searchInput" placeholder="機種名・台番号で検索"><button id="clearSearch" class="button button-outline" type="button">クリア</button></div></div>
+      <div id="storeStatus" class="status-box" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>設置台データを読み込んでいます…</span></div>
+      <div id="machineControls" hidden><div class="rate-filter"><span class="muted small">レート</span><div id="rateButtons" class="rate-buttons" role="group" aria-label="設置台のレート"></div></div><p class="machine-count small muted">表示中 <strong id="filteredCount">0</strong> 機種 / <strong id="filteredUnits">0</strong> 台</p></div>
+      <div id="machineGrid" class="machine-grid"></div>
+    </section>
+    <footer class="page-footer">PIA厚木（本厚木）のデータのみ表示しています。設置情報と過去実績は更新時刻が異なる場合があります。</footer>
+  </main>
+
+  <dialog id="mediaDialog" class="media-dialog" aria-labelledby="dialogTitle"><div class="dialog-heading"><h2 id="dialogTitle"></h2><button id="closeDialog" class="button button-outline" type="button" aria-label="閉じる">閉じる ×</button></div><div id="dialogBody" class="dialog-body"></div></dialog>
+</body>
+</html>
